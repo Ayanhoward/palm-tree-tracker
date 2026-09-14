@@ -333,7 +333,7 @@ if reset_button:
     st.rerun()
 
 # ---------------------------------------------------------
-# 5. Live Dashboard & Streaming Layout (High-FPS Optimized)
+# 5. Live Dashboard & Streaming Layout (ONNX Shape Safe)
 # ---------------------------------------------------------
 if run_button:
     col_left, col_right = st.columns([1, 2])
@@ -363,16 +363,15 @@ if run_button:
         if frame_count % frame_skip != 0:
             continue
 
-        # 2. Fast Resizing before running inference
+        # 2. Resizing for display performance
         frame = cv2.resize(raw_frame, (res_w, res_h))
 
-        # 3. Fast YOLO Tracking with imgsz=320 for high FPS
+        # 3. YOLO Tracking (imgsz override removed for ONNX compatibility)
         results = model.track(
             source=frame,
             persist=True,
             tracker="bytetrack.yaml",
             conf=conf_threshold,
-            imgsz=320,
             verbose=False
         )[0]
 
@@ -386,7 +385,7 @@ if run_button:
             frame = box_annotator.annotate(scene=frame, detections=detections)
             frame = label_annotator.annotate(scene=frame, detections=detections, labels=labels)
 
-        # 4. Low-latency JPEG Compression (Quality 30 for small network payload)
+        # 4. Low-latency JPEG Compression (Quality 30 for low bandwidth)
         encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 30]
         _, buffer = cv2.imencode('.jpg', frame, encode_param)
 
