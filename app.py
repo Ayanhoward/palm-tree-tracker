@@ -164,6 +164,66 @@ st.markdown("""
         background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%) !important;
         box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
     }
+
+    /* Team Section Alignment CSS */
+    .team-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .lead-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 10px;
+    }
+    .lead-img {
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    .member-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 8px 4px;
+        height: 100%;
+    }
+    .member-img {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: 8px;
+        object-fit: cover;
+        margin-bottom: 6px;
+    }
+    .member-name {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.15;
+        margin-bottom: 4px;
+        min-height: 2.3em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .member-role {
+        font-size: 0.68rem;
+        color: #81c784;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -251,67 +311,6 @@ with col_exp2:
         img_m5 = f"data:image/jpeg;base64,{m5_b64}" if m5_b64 else fallback_user
 
         team_html = f"""
-        <style>
-        .team-container {{
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }}
-        .lead-card {{
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 10px;
-        }}
-        .lead-img {{
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            object-fit: cover;
-        }}
-        .team-grid {{
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }}
-        .member-card {{
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 8px 4px;
-            height: 100%;
-        }}
-        .member-img {{
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            border-radius: 8px;
-            object-fit: cover;
-            margin-bottom: 6px;
-        }}
-        .member-name {{
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: #ffffff;
-            line-height: 1.15;
-            margin-bottom: 4px;
-            min-height: 2.3em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }}
-        .member-role {{
-            font-size: 0.68rem;
-            color: #81c784;
-        }}
-        </style>
-
         <div class="team-container">
             <div class="lead-card">
                 <img src="{img_ian}" class="lead-img" />
