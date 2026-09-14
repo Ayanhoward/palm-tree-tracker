@@ -1,4 +1,6 @@
+streamlit
 ultralytics
+onnxruntime
 opencv-python-headless
 lapx
 scipy
