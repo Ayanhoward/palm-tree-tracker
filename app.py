@@ -181,18 +181,18 @@ with st.sidebar:
     conf_threshold = st.slider("Confidence Threshold", 0.05, 1.0, 0.25, 0.05)
     
     st.markdown("### 📱 **Mobile Performance**")
-    frame_skip = st.slider("Frame Skip (FPS Boost)", 1, 5, 2, 1, help="Higher values reduce mobile lag over network tunnels.")
+    frame_skip = st.slider("Frame Skip (FPS Boost)", 1, 5, 3, 1, help="Higher values reduce mobile lag over network tunnels.")
     
     process_resolution = st.selectbox(
         "Display Resolution",
-        options=["480x270 (Mobile Optimized)", "640x360 (Balanced)", "320x180 (Ultra Fast)"],
+        options=["320x180 (Ultra Fast)", "480x270 (Mobile Optimized)", "640x360 (Balanced)"],
         index=0
     )
     res_w, res_h = map(int, process_resolution.split(" ")[0].split("x"))
 
     st.markdown("---")
     st.markdown("### ℹ️ **System Status**")
-    st.info("Engine: YOLOv8 + ByteTrack\n\nStatus: Active System")
+    st.info("Engine: YOLOv8 + ByteTrack\n\nStatus: High-FPS Mode")
 
 # ---------------------------------------------------------
 # 3. Main Interface Header, User Guide & Team Profiles
@@ -333,7 +333,7 @@ if reset_button:
     st.rerun()
 
 # ---------------------------------------------------------
-# 5. Live Dashboard & Streaming Layout
+# 5. Live Dashboard & Streaming Layout (High-FPS Optimized)
 # ---------------------------------------------------------
 if run_button:
     col_left, col_right = st.columns([1, 2])
@@ -358,16 +358,21 @@ if run_button:
             break
 
         frame_count += 1
+        
+        # 1. Skip frames dynamically based on sidebar setting
         if frame_count % frame_skip != 0:
             continue
 
+        # 2. Fast Resizing before running inference
         frame = cv2.resize(raw_frame, (res_w, res_h))
 
+        # 3. Fast YOLO Tracking with imgsz=320 for high FPS
         results = model.track(
             source=frame,
             persist=True,
             tracker="bytetrack.yaml",
             conf=conf_threshold,
+            imgsz=320,
             verbose=False
         )[0]
 
@@ -381,11 +386,11 @@ if run_button:
             frame = box_annotator.annotate(scene=frame, detections=detections)
             frame = label_annotator.annotate(scene=frame, detections=detections, labels=labels)
 
-        # JPEG Compression optimized to lower network bandwidth for mobile devices (quality 40)
-        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 40]
+        # 4. Low-latency JPEG Compression (Quality 30 for small network payload)
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 30]
         _, buffer = cv2.imencode('.jpg', frame, encode_param)
 
-        # Update Live Dashboard Elements
+        # 5. Live UI Updates
         video_placeholder.image(buffer.tobytes(), use_container_width=True)
         
         metric_placeholder.markdown(f"""
@@ -402,10 +407,7 @@ if run_button:
             </div>
         """, unsafe_allow_html=True)
 
-        status_placeholder.caption("🟢 **Status:** Processing Live Video...")
-
-        # Small pacing sleep to prevent ngrok websocket drop & smooth out stream on mobile
-        time.sleep(0.04)
+        status_placeholder.caption("🟢 **Status:** Processing Live Stream...")
 
     cap.release()
     status_placeholder.success("✅ **Status:** Stream Completed Successfully!")
