@@ -1,6 +1,5 @@
 dataset/
 runs/
-*.pt
-*.mp4
-*.avi
 ngrok.exe
+palm.mp4
+yolov8n.pt
