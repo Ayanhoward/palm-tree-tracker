@@ -192,7 +192,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### ℹ️ **System Status**")
-    st.info("Engine: YOLOv8 + ByteTrack\n\nStatus: Local Dev Environment")
+    st.info("Engine: YOLOv8 + ByteTrack\n\nStatus: Active System")
 
 # ---------------------------------------------------------
 # 3. Main Interface Header, User Guide & Team Profiles
@@ -296,19 +296,19 @@ label_annotator = sv.LabelAnnotator(
 )
 
 # Model Loader
-model_path = "best.onnx"
-try:
-    @st.cache_resource
-    def load_model(path):
-        return YOLO(path)
-    model = load_model(model_path)
-except Exception:
-    try:
-        model_path = "best.pt"
-        model = load_model(model_path)
-    except Exception as e:
-        st.error(f"Error loading model: {e}")
-        st.stop()
+@st.cache_resource
+def load_yolo_model():
+    for path in ["best.onnx", "best.pt"]:
+        try:
+            return YOLO(path)
+        except Exception:
+            continue
+    return None
+
+model = load_yolo_model()
+if model is None:
+    st.error("Error loading model: Neither 'best.onnx' nor 'best.pt' could be loaded. Please ensure weight files are present.")
+    st.stop()
 
 # ---------------------------------------------------------
 # 4. Input & Control Layout
