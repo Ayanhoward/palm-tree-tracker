@@ -236,70 +236,6 @@ with col_exp2:
     with st.expander("👥 **Project Development Team**", expanded=False):
         st.markdown("### **Development Team**")
         
-        # CSS Grid for Team Alignment
-        st.markdown("""
-            <style>
-            .team-container {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-            }
-            .lead-card {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-                background: rgba(255, 255, 255, 0.03);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 10px;
-                padding: 10px;
-            }
-            .lead-img {
-                width: 65px;
-                height: 65px;
-                border-radius: 50%;
-                object-fit: cover;
-            }
-            .team-grid {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 8px;
-            }
-            .member-card {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                background: rgba(255, 255, 255, 0.03);
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                border-radius: 10px;
-                padding: 8px 4px;
-                height: 100%;
-            }
-            .member-img {
-                width: 100%;
-                aspect-ratio: 1 / 1;
-                border-radius: 8px;
-                object-fit: cover;
-                margin-bottom: 6px;
-            }
-            .member-name {
-                font-size: 0.78rem;
-                font-weight: 700;
-                color: #ffffff;
-                line-height: 1.15;
-                margin-bottom: 4px;
-                min-height: 2.3em;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .member-role {
-                font-size: 0.68rem;
-                color: #81c784;
-            }
-            </style>
-        """, unsafe_allow_html=True)
-
         ian_b64 = get_image_base64("ian.jpg")
         m2_b64 = get_image_base64("member2.jpg")
         m3_b64 = get_image_base64("member3.jpg")
@@ -314,40 +250,102 @@ with col_exp2:
         img_m4 = f"data:image/jpeg;base64,{m4_b64}" if m4_b64 else fallback_user
         img_m5 = f"data:image/jpeg;base64,{m5_b64}" if m5_b64 else fallback_user
 
-        st.markdown(f"""
-            <div class="team-container">
-                <div class="lead-card">
-                    <img src="{img_ian}" class="lead-img" />
-                    <div>
-                        <div style="font-size: 1.05rem; font-weight: bold; color: #fff;">Ian Howard A. Labendia</div>
-                        <div style="font-size: 0.8rem; color: #81c784;">🏆 Project Lead & Lead Developer</div>
-                    </div>
-                </div>
+        team_html = f"""
+        <style>
+        .team-container {{
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }}
+        .lead-card {{
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+        }}
+        .lead-img {{
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+        }}
+        .team-grid {{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }}
+        .member-card {{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 8px 4px;
+            height: 100%;
+        }}
+        .member-img {{
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-bottom: 6px;
+        }}
+        .member-name {{
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.15;
+            margin-bottom: 4px;
+            min-height: 2.3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+        .member-role {{
+            font-size: 0.68rem;
+            color: #81c784;
+        }}
+        </style>
 
-                <div class="team-grid">
-                    <div class="member-card">
-                        <img src="{img_m2}" class="member-img" />
-                        <div class="member-name">Kaila Mae Chua</div>
-                        <div class="member-role">Developer</div>
-                    </div>
-                    <div class="member-card">
-                        <img src="{img_m3}" class="member-img" />
-                        <div class="member-name">Eduardo Cupin Jr.</div>
-                        <div class="member-role">Developer</div>
-                    </div>
-                    <div class="member-card">
-                        <img src="{img_m4}" class="member-img" />
-                        <div class="member-name">Rey Jan Alicante Bug-os</div>
-                        <div class="member-role">Developer</div>
-                    </div>
-                    <div class="member-card">
-                        <img src="{img_m5}" class="member-img" />
-                        <div class="member-name">Justher Jhon Javier</div>
-                        <div class="member-role">Developer</div>
-                    </div>
+        <div class="team-container">
+            <div class="lead-card">
+                <img src="{img_ian}" class="lead-img" />
+                <div>
+                    <div style="font-size: 1.05rem; font-weight: bold; color: #fff;">Ian Howard A. Labendia</div>
+                    <div style="font-size: 0.8rem; color: #81c784;">🏆 Project Lead & Lead Developer</div>
                 </div>
             </div>
-        """, unsafe_allow_html=True)
+
+            <div class="team-grid">
+                <div class="member-card">
+                    <img src="{img_m2}" class="member-img" />
+                    <div class="member-name">Kaila Mae Chua</div>
+                    <div class="member-role">Developer</div>
+                </div>
+                <div class="member-card">
+                    <img src="{img_m3}" class="member-img" />
+                    <div class="member-name">Eduardo Cupin Jr.</div>
+                    <div class="member-role">Developer</div>
+                </div>
+                <div class="member-card">
+                    <img src="{img_m4}" class="member-img" />
+                    <div class="member-name">Rey Jan Alicante Bug-os</div>
+                    <div class="member-role">Developer</div>
+                </div>
+                <div class="member-card">
+                    <img src="{img_m5}" class="member-img" />
+                    <div class="member-name">Justher Jhon Javier</div>
+                    <div class="member-role">Developer</div>
+                </div>
+            </div>
+        </div>
+        """
+        st.markdown(team_html, unsafe_allow_html=True)
 
 # Supervision Annotators
 custom_color = sv.Color(r=0, g=230, b=118)
