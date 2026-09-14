@@ -17,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Helper function to convert local GIF/images to base64 for inline HTML rendering
+# Helper function to convert local images to base64 for inline HTML
 def get_image_base64(image_file):
     try:
         with open(image_file, "rb") as f:
@@ -26,7 +26,7 @@ def get_image_base64(image_file):
     except Exception:
         return ""
 
-# Function to encode and apply local GIF background to the Sidebar
+# Function to encode and apply local GIF background to Sidebar
 def set_sidebar_bg_local(image_file):
     b64_img = get_image_base64(image_file)
     if b64_img:
@@ -68,13 +68,13 @@ def set_sidebar_bg_local(image_file):
             unsafe_allow_html=True
         )
 
-# Load sidebar GIF background
+# Load sidebar background
 set_sidebar_bg_local("sidebar_bg.gif")
 
 # Load local pixel art GIF for header
 palm_gif_b64 = get_image_base64("palm_tree.gif")
 
-# Global UI Theme Styling & Animated Gradient Header Text
+# Global Theme Styling
 st.markdown("""
     <style>
     /* Global Main Canvas Linear Gradient */
@@ -112,7 +112,6 @@ st.markdown("""
         animation: textGradientShift 6s ease infinite;
     }
 
-    /* Keyframes for Gradient Shift Animation */
     @keyframes textGradientShift {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
@@ -192,7 +191,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### ℹ️ **System Status**")
-    st.info("Engine: YOLOv8 + ByteTrack\n\nStatus: High-FPS Mode")
+    st.info("Engine: PyTorch YOLOv8 + ByteTrack\n\nStatus: High-FPS Dynamic Mode")
 
 # ---------------------------------------------------------
 # 3. Main Interface Header, User Guide & Team Profiles
@@ -228,64 +227,129 @@ with col_exp1:
         * **Custom Controls:** Fine-tune confidence thresholds and dynamic frame-skipping directly from the left sidebar.
         
         #### **How to Use:**
-        1. *(Optional)* Adjust settings in the left sidebar.
-        2. Upload an aerial video (`.mp4`, `.avi`, `.mov`) or use the default video.
-        3. Click **🚀 Start Analytics Engine** to run detection and view metrics.
+        1. Adjust detection thresholds in the left sidebar if needed.
+        2. Upload an aerial video (`.mp4`, `.avi`, `.mov`).
+        3. Click **🚀 Start Analytics Engine** to run real-time inference.
         """)
 
 with col_exp2:
     with st.expander("👥 **Project Development Team**", expanded=False):
         st.markdown("### **Development Team**")
         
-        # Row 1: Team Lead (Ian)
-        team_row1 = st.columns([1, 2])
-        with team_row1[0]:
-            try:
-                st.image("ian.jpg", use_container_width=True)
-            except Exception:
-                st.image("https://img.icons8.com/color/96/user-male-circle.png", width=75)
-        with team_row1[1]:
-            st.markdown("### **Ian Howard A. Labendia**")
-            st.caption("🏆 **Project Lead & Lead Developer**")
+        # CSS Grid for Team Alignment
+        st.markdown("""
+            <style>
+            .team-container {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .lead-card {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+                padding: 10px;
+            }
+            .lead-img {
+                width: 65px;
+                height: 65px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+            .team-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            .member-card {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 10px;
+                padding: 8px 4px;
+                height: 100%;
+            }
+            .member-img {
+                width: 100%;
+                aspect-ratio: 1 / 1;
+                border-radius: 8px;
+                object-fit: cover;
+                margin-bottom: 6px;
+            }
+            .member-name {
+                font-size: 0.78rem;
+                font-weight: 700;
+                color: #ffffff;
+                line-height: 1.15;
+                margin-bottom: 4px;
+                min-height: 2.3em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .member-role {
+                font-size: 0.68rem;
+                color: #81c784;
+            }
+            </style>
+        """, unsafe_allow_html=True)
 
-        st.markdown("---")
-        
-        # Row 2: Team Members 2 to 5 in 4 grid columns
-        m2, m3, m4, m5 = st.columns(4)
-        
-        with m2:
-            try:
-                st.image("member2.jpg", use_container_width=True)
-            except Exception:
-                st.image("https://img.icons8.com/color/96/user-male-circle.png", width=60)
-            st.markdown("**Kaila Mae Chua**")
-            st.caption("Developer")
+        ian_b64 = get_image_base64("ian.jpg")
+        m2_b64 = get_image_base64("member2.jpg")
+        m3_b64 = get_image_base64("member3.jpg")
+        m4_b64 = get_image_base64("member4.jpg")
+        m5_b64 = get_image_base64("member5.jpg")
 
-        with m3:
-            try:
-                st.image("member3.jpg", use_container_width=True)
-            except Exception:
-                st.image("https://img.icons8.com/color/96/user-male-circle.png", width=60)
-            st.markdown("**Eduardo Cupin Jr.**")
-            st.caption("Developer")
+        fallback_user = "https://img.icons8.com/color/96/user-male-circle.png"
 
-        with m4:
-            try:
-                st.image("member4.jpg", use_container_width=True)
-            except Exception:
-                st.image("https://img.icons8.com/color/96/user-male-circle.png", width=60)
-            st.markdown("**Rey Jan Alicante Bug-os**")
-            st.caption("Developer")
+        img_ian = f"data:image/jpeg;base64,{ian_b64}" if ian_b64 else fallback_user
+        img_m2 = f"data:image/jpeg;base64,{m2_b64}" if m2_b64 else fallback_user
+        img_m3 = f"data:image/jpeg;base64,{m3_b64}" if m3_b64 else fallback_user
+        img_m4 = f"data:image/jpeg;base64,{m4_b64}" if m4_b64 else fallback_user
+        img_m5 = f"data:image/jpeg;base64,{m5_b64}" if m5_b64 else fallback_user
 
-        with m5:
-            try:
-                st.image("member5.jpg", use_container_width=True)
-            except Exception:
-                st.image("https://img.icons8.com/color/96/user-male-circle.png", width=60)
-            st.markdown("**Justher Jhon Javier**")
-            st.caption("Developer")
+        st.markdown(f"""
+            <div class="team-container">
+                <div class="lead-card">
+                    <img src="{img_ian}" class="lead-img" />
+                    <div>
+                        <div style="font-size: 1.05rem; font-weight: bold; color: #fff;">Ian Howard A. Labendia</div>
+                        <div style="font-size: 0.8rem; color: #81c784;">🏆 Project Lead & Lead Developer</div>
+                    </div>
+                </div>
 
-# Annotator Setup
+                <div class="team-grid">
+                    <div class="member-card">
+                        <img src="{img_m2}" class="member-img" />
+                        <div class="member-name">Kaila Mae Chua</div>
+                        <div class="member-role">Developer</div>
+                    </div>
+                    <div class="member-card">
+                        <img src="{img_m3}" class="member-img" />
+                        <div class="member-name">Eduardo Cupin Jr.</div>
+                        <div class="member-role">Developer</div>
+                    </div>
+                    <div class="member-card">
+                        <img src="{img_m4}" class="member-img" />
+                        <div class="member-name">Rey Jan Alicante Bug-os</div>
+                        <div class="member-role">Developer</div>
+                    </div>
+                    <div class="member-card">
+                        <img src="{img_m5}" class="member-img" />
+                        <div class="member-name">Justher Jhon Javier</div>
+                        <div class="member-role">Developer</div>
+                    </div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+
+# Supervision Annotators
 custom_color = sv.Color(r=0, g=230, b=118)
 box_annotator = sv.BoxAnnotator(thickness=2, color=custom_color)
 label_annotator = sv.LabelAnnotator(
@@ -295,33 +359,23 @@ label_annotator = sv.LabelAnnotator(
     text_color=sv.Color(r=0, g=0, b=0)
 )
 
-# Model Loader
+# Load YOLO Model directly using PyTorch weights best.pt
 @st.cache_resource
 def load_yolo_model():
-    for path in ["best.onnx", "best.pt"]:
-        try:
-            return YOLO(path)
-        except Exception:
-            continue
-    return None
+    try:
+        return YOLO("best.pt")
+    except Exception as e:
+        st.error(f"Error loading model weights 'best.pt': {e}")
+        return None
 
 model = load_yolo_model()
 if model is None:
-    st.error("Error loading model: Neither 'best.onnx' nor 'best.pt' could be loaded. Please ensure weight files are present.")
     st.stop()
 
 # ---------------------------------------------------------
 # 4. Input & Control Layout
 # ---------------------------------------------------------
 uploaded_file = st.file_uploader("📂 Select Input Video Stream", type=["mp4", "avi", "mov"])
-
-if uploaded_file is not None:
-    tfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
-    tfile.write(uploaded_file.read())
-    tfile.close()
-    video_path = tfile.name
-else:
-    video_path = "input_video (1).mp4"
 
 col_btn1, col_btn2 = st.columns([2, 1])
 with col_btn1:
@@ -333,80 +387,93 @@ if reset_button:
     st.rerun()
 
 # ---------------------------------------------------------
-# 5. Live Dashboard & Streaming Layout (ONNX Shape Safe)
+# 5. Live Dashboard & Streaming Layout
 # ---------------------------------------------------------
 if run_button:
-    col_left, col_right = st.columns([1, 2])
-    
-    with col_left:
-        st.markdown("### 📊 Live Analytics")
-        metric_placeholder = st.empty()
-        frame_placeholder = st.empty()
-        status_placeholder = st.empty()
+    if uploaded_file is None:
+        st.warning("⚠️ Please upload a video file before starting the analytics engine.")
+    else:
+        # Save temporary video file locally
+        tfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
+        tfile.write(uploaded_file.read())
+        tfile.close()
+        video_path = tfile.name
+
+        col_left, col_right = st.columns([1, 2])
         
-    with col_right:
-        st.markdown("### 📹 Annotated Feed")
-        video_placeholder = st.empty()
+        with col_left:
+            st.markdown("### 📊 Live Analytics")
+            metric_placeholder = st.empty()
+            frame_placeholder = st.empty()
+            status_placeholder = st.empty()
+            
+        with col_right:
+            st.markdown("### 📹 Annotated Feed")
+            video_placeholder = st.empty()
 
-    cap = cv2.VideoCapture(video_path)
-    unique_palm_ids = set()
-    frame_count = 0
+        # OpenCV with low buffer size for low latency
+        cap = cv2.VideoCapture(video_path, cv2.CAP_FFMPEG)
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
-    while cap.isOpened():
-        ret, raw_frame = cap.read()
-        if not ret:
-            break
+        unique_palm_ids = set()
+        frame_count = 0
 
-        frame_count += 1
-        
-        # 1. Skip frames dynamically based on sidebar setting
-        if frame_count % frame_skip != 0:
-            continue
+        while cap.isOpened():
+            ret, raw_frame = cap.read()
+            if not ret:
+                break
 
-        # 2. Resizing for display performance
-        frame = cv2.resize(raw_frame, (res_w, res_h))
+            frame_count += 1
+            
+            # Skip frames for smoother streaming
+            if frame_count % frame_skip != 0:
+                continue
 
-        # 3. YOLO Tracking (imgsz override removed for ONNX compatibility)
-        results = model.track(
-            source=frame,
-            persist=True,
-            tracker="bytetrack.yaml",
-            conf=conf_threshold,
-            verbose=False
-        )[0]
+            # Resize frame early to save compute resources
+            frame = cv2.resize(raw_frame, (res_w, res_h))
 
-        detections = sv.Detections.from_ultralytics(results)
+            # YOLO High-FPS Tracking
+            results = model.track(
+                source=frame,
+                persist=True,
+                tracker="bytetrack.yaml",
+                conf=conf_threshold,
+                imgsz=320,
+                verbose=False
+            )[0]
 
-        if detections.tracker_id is not None:
-            for tracker_id in detections.tracker_id:
-                unique_palm_ids.add(int(tracker_id))
+            detections = sv.Detections.from_ultralytics(results)
 
-            labels = [f"Palm #{tid}" for tid in detections.tracker_id]
-            frame = box_annotator.annotate(scene=frame, detections=detections)
-            frame = label_annotator.annotate(scene=frame, detections=detections, labels=labels)
+            if detections.tracker_id is not None:
+                for tracker_id in detections.tracker_id:
+                    unique_palm_ids.add(int(tracker_id))
 
-        # 4. Low-latency JPEG Compression (Quality 30 for low bandwidth)
-        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 30]
-        _, buffer = cv2.imencode('.jpg', frame, encode_param)
+                labels = [f"Palm #{tid}" for tid in detections.tracker_id]
+                frame = box_annotator.annotate(scene=frame, detections=detections)
+                frame = label_annotator.annotate(scene=frame, detections=detections, labels=labels)
 
-        # 5. Live UI Updates
-        video_placeholder.image(buffer.tobytes(), use_container_width=True)
-        
-        metric_placeholder.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-value">{len(unique_palm_ids)}</div>
-                <div class="metric-label">Total Palms Identified</div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        frame_placeholder.markdown(f"""
-            <div class="metric-card" style="border-color: #424242;">
-                <div class="metric-value" style="color: #9e9e9e;">{frame_count}</div>
-                <div class="metric-label">Processed Frames</div>
-            </div>
-        """, unsafe_allow_html=True)
+            # Low latency compressed JPEG encoding
+            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 35]
+            _, buffer = cv2.imencode('.jpg', frame, encode_param)
 
-        status_placeholder.caption("🟢 **Status:** Processing Live Stream...")
+            # Update Streamlit UI
+            video_placeholder.image(buffer.tobytes(), use_container_width=True)
+            
+            metric_placeholder.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-value">{len(unique_palm_ids)}</div>
+                    <div class="metric-label">Total Palms Identified</div>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            frame_placeholder.markdown(f"""
+                <div class="metric-card" style="border-color: #424242;">
+                    <div class="metric-value" style="color: #9e9e9e;">{frame_count}</div>
+                    <div class="metric-label">Processed Frames</div>
+                </div>
+            """, unsafe_allow_html=True)
 
-    cap.release()
-    status_placeholder.success("✅ **Status:** Stream Completed Successfully!")
+            status_placeholder.caption("🟢 **Status:** Processing Live Stream...")
+
+        cap.release()
+        status_placeholder.success("✅ **Status:** Stream Completed Successfully!")
