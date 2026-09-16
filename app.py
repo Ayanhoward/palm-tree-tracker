@@ -11,13 +11,12 @@ from ultralytics import YOLO
 # 1. Page Configuration & Custom UI Design
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="Palm Tree Counter",
+    page_title="Palm Tree Tracker",
     page_icon="🌴",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Helper function to convert local GIF/images to base64 for inline HTML rendering
 def get_image_base64(image_file):
     try:
         with open(image_file, "rb") as f:
@@ -26,7 +25,6 @@ def get_image_base64(image_file):
     except Exception:
         return ""
 
-# Function to encode and apply local GIF background to the Sidebar
 def set_sidebar_bg_local(image_file):
     b64_img = get_image_base64(image_file)
     if b64_img:
@@ -43,10 +41,7 @@ def set_sidebar_bg_local(image_file):
             [data-testid="stSidebar"]::before {{
                 content: "";
                 position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
+                top: 0; left: 0; width: 100%; height: 100%;
                 background-color: rgba(11, 15, 18, 0.75);
                 z-index: -1;
             }}
@@ -74,17 +69,15 @@ set_sidebar_bg_local("sidebar_bg.gif")
 # Load local pixel art GIF for header
 palm_gif_b64 = get_image_base64("palm_tree.gif")
 
-# Global UI Theme Styling & Animated Gradient Header Text
+# Global UI Theme Styling
 st.markdown("""
     <style>
-    /* Global Main Canvas Linear Gradient */
     .stApp {
         background: linear-gradient(135deg, #0b0f12 0%, #112214 50%, #0b0f12 100%);
         background-attachment: fixed;
         color: #e0e0e0;
     }
 
-    /* Header Flex Container */
     .header-container {
         display: flex;
         align-items: center;
@@ -92,14 +85,12 @@ st.markdown("""
         margin-bottom: 5px;
     }
 
-    /* Original Pixel Art GIF Styling */
     .header-palm-gif {
         height: 52px;
         width: auto;
         object-fit: contain;
     }
 
-    /* Animated Color Gradient Title Text */
     .animated-title {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-size: 2.2rem;
@@ -112,7 +103,6 @@ st.markdown("""
         animation: textGradientShift 6s ease infinite;
     }
 
-    /* Keyframes for Gradient Shift Animation */
     @keyframes textGradientShift {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
@@ -125,7 +115,33 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    /* Custom Metric Cards */
+    .camera-feature-card {
+        background: rgba(18, 30, 22, 0.7);
+        border: 1px solid #2e7d32;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 15px;
+    }
+
+    .badge-coconut {
+        background-color: #1b5e20;
+        color: #00e676;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-right: 6px;
+    }
+
+    .badge-palm {
+        background-color: #2e7d32;
+        color: #a7f3d0;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
     .metric-card {
         background-color: rgba(22, 28, 34, 0.85);
         border: 1px solid #2e7d32;
@@ -149,7 +165,6 @@ st.markdown("""
         letter-spacing: 1px;
     }
 
-    /* Button Styling */
     div.stButton > button {
         background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%) !important;
         color: white !important;
@@ -173,15 +188,15 @@ st.markdown("""
 # ---------------------------------------------------------
 with st.sidebar:
     st.image("https://img.icons8.com/color/96/palm-tree.png", width=70)
-    st.markdown("## **PalmTracker AI**")
-    st.caption("Mobile Object Detection System")
+    st.markdown("## **Palm Tree Tracker**")
+    st.caption("AI-Powered Detection System")
     st.markdown("---")
 
     st.markdown("### ⚙️ **Detection Settings**")
     conf_threshold = st.slider("Confidence Threshold", 0.05, 1.0, 0.25, 0.05)
     
     st.markdown("### 📱 **Mobile Performance**")
-    frame_skip = st.slider("Frame Skip (FPS Boost)", 1, 5, 3, 1, help="Higher values reduce mobile lag over network tunnels.")
+    frame_skip = st.slider("Frame Skip (FPS Boost)", 1, 5, 3, 1)
     
     process_resolution = st.selectbox(
         "Display Resolution",
@@ -192,7 +207,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### ℹ️ **System Status**")
-    st.info("Engine: YOLOv8 + ByteTrack\n\nStatus: High-FPS Mode")
+    st.info("Engine: YOLOv8 + ByteTrack\n\nStatus: Live Tracking Active")
 
 # ---------------------------------------------------------
 # 3. Main Interface Header, User Guide & Team Profiles
@@ -201,43 +216,37 @@ if palm_gif_b64:
     header_html = f"""
         <div class='header-container'>
             <img src='data:image/gif;base64,{palm_gif_b64}' class='header-palm-gif' />
-            <span class='animated-title'>Palm Tree Detection & Counting</span>
+            <span class='animated-title'>Palm Tree Tracker</span>
         </div>
     """
 else:
     header_html = """
         <div class='header-container'>
-            <span class='animated-title'>🌴 Palm Tree Detection & Counting</span>
+            <span class='animated-title'>🌴 Palm Tree Tracker</span>
         </div>
     """
 
 st.markdown(header_html, unsafe_allow_html=True)
-st.markdown("<p class='sub-header'>Aerial Video Analytics and Automated Counting System</p>", unsafe_allow_html=True)
+st.markdown("<p class='sub-header'>Real-Time Aerial & Mobile Tree Analytics System</p>", unsafe_allow_html=True)
 
 col_exp1, col_exp2 = st.columns(2)
 
 with col_exp1:
     with st.expander("📖 **About This System & User Guide**", expanded=False):
         st.markdown("""
-        ### **Welcome to PalmTracker AI**
-        This application is designed for real-time aerial object detection and computer vision tracking of palm trees using drone video footage.
+        ### **Welcome to Palm Tree Tracker**
+        This application is designed for real-time aerial and mobile object detection to track and analyze tree species.
         
         #### **Key Features:**
-        * **Automated Counting:** Utilizes **YOLOv8** for real-time palm detection and **ByteTrack** for persistent tracking IDs.
-        * **Mobile Optimized:** Downscales resolution and compresses frame bandwidth to ensure fluid performance on mobile devices over network tunnels.
-        * **Custom Controls:** Fine-tune confidence thresholds and dynamic frame-skipping directly from the left sidebar.
-        
-        #### **How to Use:**
-        1. *(Optional)* Adjust settings in the left sidebar.
-        2. Upload an aerial video (`.mp4`, `.avi`, `.mov`) or use the default video.
-        3. Click **🚀 Start Analytics Engine** to run detection and view metrics.
+        * **Automated Identification:** Leverages **YOLOv8** to track palm and coconut trees.
+        * **Species Identification Mode:** Upload photos or capture via camera to identify tree species instantly.
+        * **Mobile Optimized:** High-FPS throughput and real-time analytics.
         """)
 
 with col_exp2:
     with st.expander("👥 **Project Development Team**", expanded=False):
         st.markdown("### **Development Team**")
         
-        # Row 1: Team Lead (Ian)
         team_row1 = st.columns([1, 2])
         with team_row1[0]:
             try:
@@ -250,9 +259,7 @@ with col_exp2:
 
         st.markdown("---")
         
-        # Row 2: Team Members 2 to 5 in 4 grid columns
         m2, m3, m4, m5 = st.columns(4)
-        
         with m2:
             try:
                 st.image("member2.jpg", use_container_width=True)
@@ -307,21 +314,57 @@ def load_yolo_model():
 
 model = load_yolo_model()
 if model is None:
-    st.error("Error loading model: Neither 'best.onnx' nor 'best.pt' could be loaded. Please ensure weight files are present.")
+    st.error("Error loading model: Neither 'best.onnx' nor 'best.pt' could be loaded.")
     st.stop()
 
 # ---------------------------------------------------------
 # 4. Input & Control Layout
 # ---------------------------------------------------------
-uploaded_file = st.file_uploader("📂 Select Input Video Stream", type=["mp4", "avi", "mov"])
+input_mode = st.radio(
+    "📂 **Select Operation Mode:**",
+    ["📹 Aerial Stream Analysis", "📸 Photo & Camera Tree Classifier"],
+    horizontal=True
+)
 
-if uploaded_file is not None:
-    tfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
-    tfile.write(uploaded_file.read())
-    tfile.close()
-    video_path = tfile.name
-else:
-    video_path = "input_video (1).mp4"
+video_path = None
+
+if input_mode == "📹 Aerial Stream Analysis":
+    uploaded_file = st.file_uploader("📂 Upload Video Stream File", type=["mp4", "avi", "mov"])
+    if uploaded_file is not None:
+        tfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
+        tfile.write(uploaded_file.read())
+        tfile.close()
+        video_path = tfile.name
+    else:
+        video_path = "input_video (1).mp4"
+
+elif input_mode == "📸 Photo & Camera Tree Classifier":
+    st.markdown("""
+        <div class="camera-feature-card">
+            <h4 style="margin:0 0 8px 0; color:#81c784;">🔍 Tree Identification Feature</h4>
+            <p style="margin:0 0 10px 0; font-size:13px; color:#c8e6c9;">
+                Upload a photo or take a live camera shot to classify and count species in real time:
+            </p>
+            <span class="badge-coconut">🥥 Coconut Tree</span>
+            <span class="badge-palm">🌴 Palm Tree</span>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    photo_input_type = st.radio(
+        "Choose Photo Input Source:",
+        ["🖼️ Upload Photo File", "📷 Take Photo with Camera"],
+        horizontal=True
+    )
+    
+    image_bytes = None
+    if photo_input_type == "🖼️ Upload Photo File":
+        uploaded_img = st.file_uploader("Upload an Image File", type=["jpg", "jpeg", "png"])
+        if uploaded_img is not None:
+            image_bytes = uploaded_img.read()
+    else:
+        camera_shot = st.camera_input("Take a photo to identify tree species")
+        if camera_shot is not None:
+            image_bytes = camera_shot.read()
 
 col_btn1, col_btn2 = st.columns([2, 1])
 with col_btn1:
@@ -333,14 +376,59 @@ if reset_button:
     st.rerun()
 
 # ---------------------------------------------------------
-# 5. Live Dashboard & Streaming Layout (ONNX Shape Safe)
+# 5. Live Dashboard & Processing
 # ---------------------------------------------------------
-if run_button:
+# Photo & Camera Classifier Output
+if input_mode == "📸 Photo & Camera Tree Classifier" and image_bytes is not None:
+    file_bytes = np.asarray(bytearray(image_bytes), dtype=np.uint8)
+    frame = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+    
+    results = model.predict(source=frame, conf=conf_threshold, verbose=False)[0]
+    detections = sv.Detections.from_ultralytics(results)
+    
+    class_names = model.names if hasattr(model, 'names') else {0: 'coconut_tree', 1: 'palm_tree'}
+    
+    coconut_count = 0
+    palm_count = 0
+    
+    if detections.class_id is not None:
+        labels = []
+        for cid in detections.class_id:
+            c_name = class_names.get(int(cid), "Tree")
+            labels.append(c_name)
+            if "coconut" in c_name.lower():
+                coconut_count += 1
+            else:
+                palm_count += 1
+
+        frame = box_annotator.annotate(scene=frame, detections=detections)
+        frame = label_annotator.annotate(scene=frame, detections=detections, labels=labels)
+        
+    m_col1, m_col2 = st.columns(2)
+    with m_col1:
+        st.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-value">{coconut_count}</div>
+                <div class="metric-label">🥥 Coconut Trees Detected</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with m_col2:
+        st.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-value">{palm_count}</div>
+                <div class="metric-label">🌴 Palm Trees Detected</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+    st.image(frame, channels="BGR", caption="Classification Result", use_container_width=True)
+
+# Video Stream Mode Output
+elif input_mode == "📹 Aerial Stream Analysis" and run_button:
     col_left, col_right = st.columns([1, 2])
     
     with col_left:
         st.markdown("### 📊 Live Analytics")
-        metric_placeholder = st.empty()
+        total_trees_metric = st.empty()
         frame_placeholder = st.empty()
         status_placeholder = st.empty()
         
@@ -349,8 +437,10 @@ if run_button:
         video_placeholder = st.empty()
 
     cap = cv2.VideoCapture(video_path)
-    unique_palm_ids = set()
+    unique_tree_ids = set()
     frame_count = 0
+
+    class_names = model.names if hasattr(model, 'names') else {0: 'palm_tree'}
 
     while cap.isOpened():
         ret, raw_frame = cap.read()
@@ -359,14 +449,11 @@ if run_button:
 
         frame_count += 1
         
-        # 1. Skip frames dynamically based on sidebar setting
         if frame_count % frame_skip != 0:
             continue
 
-        # 2. Resizing for display performance
         frame = cv2.resize(raw_frame, (res_w, res_h))
 
-        # 3. YOLO Tracking (imgsz override removed for ONNX compatibility)
         results = model.track(
             source=frame,
             persist=True,
@@ -377,25 +464,25 @@ if run_button:
 
         detections = sv.Detections.from_ultralytics(results)
 
-        if detections.tracker_id is not None:
-            for tracker_id in detections.tracker_id:
-                unique_palm_ids.add(int(tracker_id))
+        if detections.tracker_id is not None and detections.class_id is not None:
+            labels = []
+            for tracker_id, class_id in zip(detections.tracker_id, detections.class_id):
+                c_name = class_names.get(int(class_id), "Palm Tree")
+                unique_tree_ids.add(int(tracker_id))
+                labels.append(f"{c_name} #{tracker_id}")
 
-            labels = [f"Palm #{tid}" for tid in detections.tracker_id]
             frame = box_annotator.annotate(scene=frame, detections=detections)
             frame = label_annotator.annotate(scene=frame, detections=detections, labels=labels)
 
-        # 4. Low-latency JPEG Compression (Quality 30 for low bandwidth)
         encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 30]
         _, buffer = cv2.imencode('.jpg', frame, encode_param)
 
-        # 5. Live UI Updates
         video_placeholder.image(buffer.tobytes(), use_container_width=True)
         
-        metric_placeholder.markdown(f"""
+        total_trees_metric.markdown(f"""
             <div class="metric-card">
-                <div class="metric-value">{len(unique_palm_ids)}</div>
-                <div class="metric-label">Total Palms Identified</div>
+                <div class="metric-value">{len(unique_tree_ids)}</div>
+                <div class="metric-label">🌴 Total Palm Trees Tracked</div>
             </div>
         """, unsafe_allow_html=True)
         
