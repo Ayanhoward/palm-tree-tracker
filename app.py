@@ -11,8 +11,8 @@ from ultralytics import YOLO
 # 1. Page Configuration & Custom UI Design
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="Palm Tree Tracker",
-    page_icon="🌴",
+    page_title="Palm & Coconut Tree Tracker",
+    page_icon="🥥",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -63,10 +63,10 @@ def set_sidebar_bg_local(image_file):
             unsafe_allow_html=True
         )
 
-# Load sidebar GIF background
+# Load sidebar GIF background if available
 set_sidebar_bg_local("sidebar_bg.gif")
 
-# Load local pixel art GIF for header
+# Load local pixel art GIF for header if available
 palm_gif_b64 = get_image_base64("palm_tree.gif")
 
 # Global UI Theme Styling
@@ -133,15 +133,6 @@ st.markdown("""
         margin-right: 6px;
     }
 
-    .badge-palm {
-        background-color: #2e7d32;
-        color: #a7f3d0;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: bold;
-    }
-
     .metric-card {
         background-color: rgba(22, 28, 34, 0.85);
         border: 1px solid #2e7d32;
@@ -188,12 +179,12 @@ st.markdown("""
 # ---------------------------------------------------------
 with st.sidebar:
     st.image("https://img.icons8.com/color/96/palm-tree.png", width=70)
-    st.markdown("## **Palm Tree Tracker**")
+    st.markdown("## **Coconut Tree Tracker**")
     st.caption("AI-Powered Detection System")
     st.markdown("---")
 
     st.markdown("### ⚙️ **Detection Settings**")
-    conf_threshold = st.slider("Confidence Threshold", 0.05, 1.0, 0.50, 0.05)
+    conf_threshold = st.slider("Confidence Threshold", 0.05, 1.0, 0.40, 0.05)
     
     st.markdown("### 📱 **Mobile Performance**")
     frame_skip = st.slider("Frame Skip (FPS Boost)", 1, 5, 3, 1)
@@ -216,13 +207,13 @@ if palm_gif_b64:
     header_html = f"""
         <div class='header-container'>
             <img src='data:image/gif;base64,{palm_gif_b64}' class='header-palm-gif' />
-            <span class='animated-title'>Palm Tree Tracker</span>
+            <span class='animated-title'>Coconut Tree Tracker</span>
         </div>
     """
 else:
     header_html = """
         <div class='header-container'>
-            <span class='animated-title'>🌴 Palm Tree Tracker</span>
+            <span class='animated-title'>🥥 Coconut Tree Tracker</span>
         </div>
     """
 
@@ -234,12 +225,12 @@ col_exp1, col_exp2 = st.columns(2)
 with col_exp1:
     with st.expander("📖 **About This System & User Guide**", expanded=False):
         st.markdown("""
-        ### **Welcome to Palm Tree Tracker**
-        This application is designed for real-time aerial and mobile object detection to track and analyze tree species.
+        ### **Welcome to Coconut Tree Tracker**
+        This application is designed for real-time aerial and mobile object detection to track and analyze coconut trees.
         
         #### **Key Features:**
-        * **Automated Identification:** Leverages **YOLOv8** to track palm and coconut trees.
-        * **Species Identification Mode:** Upload photos or capture via camera to identify tree species instantly.
+        * **Automated Identification:** Leverages **YOLOv8** trained specifically on coconut tree datasets.
+        * **Species Identification Mode:** Upload photos or capture via camera to identify coconut trees instantly.
         * **Mobile Optimized:** High-FPS throughput and real-time analytics.
         """)
 
@@ -322,7 +313,7 @@ if model is None:
 # ---------------------------------------------------------
 input_mode = st.radio(
     "📂 **Select Operation Mode:**",
-    ["📹 Aerial Stream Analysis", "📸 Photo & Camera Tree Classifier"],
+    ["📹 Aerial Stream Analysis", "📸 Photo & Camera Tree Classifier", "📷 Live Camera Streaming"],
     horizontal=True
 )
 
@@ -341,12 +332,11 @@ if input_mode == "📹 Aerial Stream Analysis":
 elif input_mode == "📸 Photo & Camera Tree Classifier":
     st.markdown("""
         <div class="camera-feature-card">
-            <h4 style="margin:0 0 8px 0; color:#81c784;">🔍 Tree Identification Feature</h4>
+            <h4 style="margin:0 0 8px 0; color:#81c784;">🔍 Coconut Tree Identification Feature</h4>
             <p style="margin:0 0 10px 0; font-size:13px; color:#c8e6c9;">
-                Upload a photo or take a live camera shot to classify and count species in real time:
+                Upload a photo or take a live camera shot to classify and count coconut trees in real time:
             </p>
             <span class="badge-coconut">🥥 Coconut Tree</span>
-            <span class="badge-palm">🌴 Palm Tree</span>
         </div>
     """, unsafe_allow_html=True)
     
@@ -362,9 +352,19 @@ elif input_mode == "📸 Photo & Camera Tree Classifier":
         if uploaded_img is not None:
             image_bytes = uploaded_img.read()
     else:
-        camera_shot = st.camera_input("Take a photo to identify tree species")
+        camera_shot = st.camera_input("Take a photo to identify coconut trees")
         if camera_shot is not None:
             image_bytes = camera_shot.read()
+
+elif input_mode == "📷 Live Camera Streaming":
+    st.markdown("""
+        <div class="camera-feature-card">
+            <h4 style="margin:0 0 8px 0; color:#81c784;">📹 Real-Time Web Camera Feed</h4>
+            <p style="margin:0 0 10px 0; font-size:13px; color:#c8e6c9;">
+                Use your device camera for real-time video detection and counting.
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
 
 col_btn1, col_btn2 = st.columns([2, 1])
 with col_btn1:
@@ -386,11 +386,7 @@ if input_mode == "📸 Photo & Camera Tree Classifier" and image_bytes is not No
     results = model.predict(source=frame, conf=conf_threshold, verbose=False)[0]
     detections = sv.Detections.from_ultralytics(results)
     
-    class_names = model.names if hasattr(model, 'names') else {0: 'coconut_tree', 1: 'palm_tree'}
-    
     coconut_count = 0
-    palm_count = 0
-    
     filtered_classes = []
     filtered_boxes = []
     filtered_conf = []
@@ -398,24 +394,15 @@ if input_mode == "📸 Photo & Camera Tree Classifier" and image_bytes is not No
     
     if detections.class_id is not None and detections.confidence is not None:
         for box, cid, conf in zip(detections.xyxy, detections.class_id, detections.confidence):
-            # Enforce strict confidence and strict name matching to block false positives on faces/objects
-            if conf < max(conf_threshold, 0.60):
+            if conf < conf_threshold:
                 continue
                 
-            c_name = class_names.get(int(cid), "").lower()
-            
-            if "coconut" in c_name:
-                coconut_count += 1
-                labels.append(f"Coconut Tree ({conf:.2f})")
-                filtered_classes.append(cid)
-                filtered_boxes.append(box)
-                filtered_conf.append(conf)
-            elif "palm" in c_name:
-                palm_count += 1
-                labels.append(f"Palm Tree ({conf:.2f})")
-                filtered_classes.append(cid)
-                filtered_boxes.append(box)
-                filtered_conf.append(conf)
+            # Treat model detections as Coconut Trees since the dataset is specifically for coconut trees
+            coconut_count += 1
+            labels.append(f"Coconut Tree ({conf:.2f})")
+            filtered_classes.append(cid)
+            filtered_boxes.append(box)
+            filtered_conf.append(conf)
             
         if filtered_boxes:
             detections.xyxy = np.array(filtered_boxes)
@@ -429,7 +416,7 @@ if input_mode == "📸 Photo & Camera Tree Classifier" and image_bytes is not No
             detections.class_id = np.array([], dtype=int)
             detections.confidence = np.array([], dtype=float)
         
-    m_col1, m_col2 = st.columns(2)
+    m_col1 = st.columns(1)[0]
     with m_col1:
         st.markdown(f"""
             <div class="metric-card">
@@ -437,18 +424,62 @@ if input_mode == "📸 Photo & Camera Tree Classifier" and image_bytes is not No
                 <div class="metric-label">🥥 Coconut Trees Detected</div>
             </div>
         """, unsafe_allow_html=True)
-    with m_col2:
-        st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-value">{palm_count}</div>
-                <div class="metric-label">🌴 Palm Trees Detected</div>
-            </div>
-        """, unsafe_allow_html=True)
 
-    if coconut_count == 0 and palm_count == 0:
-        st.warning("⚠️ No coconut or palm tree detected in this image.")
+    if coconut_count == 0:
+        st.warning("⚠️ No coconut tree detected in this image. Try lowering the confidence threshold or uploading a clearer photo.")
 
     st.image(frame, channels="BGR", caption="Classification Result", use_container_width=True)
+
+# Live Web Camera Streaming Mode
+elif input_mode == "📷 Live Camera Streaming" and run_button:
+    st.markdown("### 🔴 Live Web Camera Feed Running...")
+    cam_placeholder = st.empty()
+    metric_placeholder = st.empty()
+    
+    cap = cv2.VideoCapture(0)
+    unique_tree_ids = set()
+    frame_count = 0
+    
+    while cap.isOpened():
+        ret, raw_frame = cap.read()
+        if not ret:
+            st.error("Failed to access web camera.")
+            break
+            
+        frame_count += 1
+        frame = cv2.resize(raw_frame, (res_w, res_h))
+        
+        results = model.track(
+            source=frame,
+            persist=True,
+            tracker="bytetrack.yaml",
+            conf=conf_threshold,
+            verbose=False
+        )[0]
+        
+        detections = sv.Detections.from_ultralytics(results)
+        
+        if detections.tracker_id is not None and detections.class_id is not None:
+            labels = []
+            for tracker_id in detections.tracker_id:
+                unique_tree_ids.add(int(tracker_id))
+                labels.append(f"Coconut #{tracker_id}")
+                
+            frame = box_annotator.annotate(scene=frame, detections=detections)
+            frame = label_annotator.annotate(scene=frame, detections=detections, labels=labels)
+            
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 30]
+        _, buffer = cv2.imencode('.jpg', frame, encode_param)
+        
+        cam_placeholder.image(buffer.tobytes(), use_container_width=True)
+        metric_placeholder.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-value">{len(unique_tree_ids)}</div>
+                <div class="metric-label">🥥 Total Unique Coconut Trees Tracked (Live Camera)</div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    cap.release()
 
 # Video Stream Mode Output
 elif input_mode == "📹 Aerial Stream Analysis" and run_button:
@@ -467,8 +498,6 @@ elif input_mode == "📹 Aerial Stream Analysis" and run_button:
     cap = cv2.VideoCapture(video_path)
     unique_tree_ids = set()
     frame_count = 0
-
-    class_names = model.names if hasattr(model, 'names') else {0: 'palm_tree'}
 
     while cap.isOpened():
         ret, raw_frame = cap.read()
@@ -494,10 +523,9 @@ elif input_mode == "📹 Aerial Stream Analysis" and run_button:
 
         if detections.tracker_id is not None and detections.class_id is not None:
             labels = []
-            for tracker_id, class_id in zip(detections.tracker_id, detections.class_id):
-                c_name = class_names.get(int(class_id), "Palm Tree")
+            for tracker_id in detections.tracker_id:
                 unique_tree_ids.add(int(tracker_id))
-                labels.append(f"{c_name} #{tracker_id}")
+                labels.append(f"Coconut #{tracker_id}")
 
             frame = box_annotator.annotate(scene=frame, detections=detections)
             frame = label_annotator.annotate(scene=frame, detections=detections, labels=labels)
@@ -510,7 +538,7 @@ elif input_mode == "📹 Aerial Stream Analysis" and run_button:
         total_trees_metric.markdown(f"""
             <div class="metric-card">
                 <div class="metric-value">{len(unique_tree_ids)}</div>
-                <div class="metric-label">🌴 Total Palm Trees Tracked</div>
+                <div class="metric-label">🥥 Total Coconut Trees Tracked</div>
             </div>
         """, unsafe_allow_html=True)
         
