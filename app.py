@@ -193,7 +193,7 @@ with st.sidebar:
     st.markdown("---")
 
     st.markdown("### ⚙️ **Detection Settings**")
-    conf_threshold = st.slider("Confidence Threshold", 0.05, 1.0, 0.25, 0.05)
+    conf_threshold = st.slider("Confidence Threshold", 0.05, 1.0, 0.50, 0.05)
     
     st.markdown("### 📱 **Mobile Performance**")
     frame_skip = st.slider("Frame Skip (FPS Boost)", 1, 5, 3, 1)
@@ -398,22 +398,24 @@ if input_mode == "📸 Photo & Camera Tree Classifier" and image_bytes is not No
     
     if detections.class_id is not None and detections.confidence is not None:
         for box, cid, conf in zip(detections.xyxy, detections.class_id, detections.confidence):
-            # Strict confidence filter to eliminate false positives on non-tree objects like humans
-            if conf < max(conf_threshold, 0.40):
+            # Enforce strict confidence and strict name matching to block false positives on faces/objects
+            if conf < max(conf_threshold, 0.60):
                 continue
                 
-            c_name = class_names.get(int(cid), "Tree")
+            c_name = class_names.get(int(cid), "").lower()
             
-            if "coconut" in c_name.lower():
+            if "coconut" in c_name:
                 coconut_count += 1
-                labels.append(f"Coconut ({conf:.2f})")
-            else:
+                labels.append(f"Coconut Tree ({conf:.2f})")
+                filtered_classes.append(cid)
+                filtered_boxes.append(box)
+                filtered_conf.append(conf)
+            elif "palm" in c_name:
                 palm_count += 1
-                labels.append(f"Palm ({conf:.2f})")
-                
-            filtered_classes.append(cid)
-            filtered_boxes.append(box)
-            filtered_conf.append(conf)
+                labels.append(f"Palm Tree ({conf:.2f})")
+                filtered_classes.append(cid)
+                filtered_boxes.append(box)
+                filtered_conf.append(conf)
             
         if filtered_boxes:
             detections.xyxy = np.array(filtered_boxes)
@@ -443,7 +445,6 @@ if input_mode == "📸 Photo & Camera Tree Classifier" and image_bytes is not No
             </div>
         """, unsafe_allow_html=True)
 
-    # ADDED: Warning message if no coconut or palm trees are detected
     if coconut_count == 0 and palm_count == 0:
         st.warning("⚠️ No coconut or palm tree detected in this image.")
 
