@@ -391,18 +391,41 @@ if input_mode == "📸 Photo & Camera Tree Classifier" and image_bytes is not No
     coconut_count = 0
     palm_count = 0
     
-    if detections.class_id is not None:
-        labels = []
-        for cid in detections.class_id:
+    filtered_classes = []
+    filtered_boxes = []
+    filtered_conf = []
+    labels = []
+    
+    if detections.class_id is not None and detections.confidence is not None:
+        for box, cid, conf in zip(detections.xyxy, detections.class_id, detections.confidence):
+            # Strict confidence filter to eliminate false positives on non-tree objects like humans
+            if conf < max(conf_threshold, 0.40):
+                continue
+                
             c_name = class_names.get(int(cid), "Tree")
-            labels.append(c_name)
+            
             if "coconut" in c_name.lower():
                 coconut_count += 1
+                labels.append(f"Coconut ({conf:.2f})")
             else:
                 palm_count += 1
-
-        frame = box_annotator.annotate(scene=frame, detections=detections)
-        frame = label_annotator.annotate(scene=frame, detections=detections, labels=labels)
+                labels.append(f"Palm ({conf:.2f})")
+                
+            filtered_classes.append(cid)
+            filtered_boxes.append(box)
+            filtered_conf.append(conf)
+            
+        if filtered_boxes:
+            detections.xyxy = np.array(filtered_boxes)
+            detections.class_id = np.array(filtered_classes)
+            detections.confidence = np.array(filtered_conf)
+            
+            frame = box_annotator.annotate(scene=frame, detections=detections)
+            frame = label_annotator.annotate(scene=frame, detections=detections, labels=labels)
+        else:
+            detections.xyxy = np.empty((0, 4))
+            detections.class_id = np.array([], dtype=int)
+            detections.confidence = np.array([], dtype=float)
         
     m_col1, m_col2 = st.columns(2)
     with m_col1:
