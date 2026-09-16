@@ -443,6 +443,10 @@ if input_mode == "📸 Photo & Camera Tree Classifier" and image_bytes is not No
             </div>
         """, unsafe_allow_html=True)
 
+    # ADDED: Warning message if no coconut or palm trees are detected
+    if coconut_count == 0 and palm_count == 0:
+        st.warning("⚠️ No coconut or palm tree detected in this image.")
+
     st.image(frame, channels="BGR", caption="Classification Result", use_container_width=True)
 
 # Video Stream Mode Output
