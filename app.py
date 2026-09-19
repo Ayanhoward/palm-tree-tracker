@@ -195,6 +195,52 @@ with st.sidebar:
     res_w, res_h = map(int, process_resolution.split(" ")[0].split("x"))
 
     st.markdown("---")
+    st.markdown("### 📥 **Download Demo Samples**")
+    st.caption("Download test files to try the app:")
+
+    with st.expander("🖼️ Sample Images"):
+        samples = [
+            ("Sample 1", "sample1.jpg"),
+            ("Sample 2", "sample2.jpg"),
+            ("Sample 3", "sample3.png"),
+            ("Sample 4", "sample4.jpg")
+        ]
+        for label, filename in samples:
+            try:
+                with open(filename, "rb") as f:
+                    mime_type = "image/png" if filename.endswith(".png") else "image/jpeg"
+                    st.download_button(
+                        label=f"Download {label}",
+                        data=f,
+                        file_name=filename,
+                        mime=mime_type,
+                        use_container_width=True,
+                        key=f"dl_{filename}"
+                    )
+            except FileNotFoundError:
+                pass
+
+    with st.expander("📹 Sample Videos"):
+        videos = [
+            ("Default Video", "palm tree.mp4"),
+            ("Palm Tree Video 2", "palm tree 2.mp4"),
+            ("Palm Tree Video 3", "palm tree 3.mp4")
+        ]
+        for label, filename in videos:
+            try:
+                with open(filename, "rb") as f:
+                    st.download_button(
+                        label=f"Download {label}",
+                        data=f,
+                        file_name=filename,
+                        mime="video/mp4",
+                        use_container_width=True,
+                        key=f"dl_{filename}"
+                    )
+            except FileNotFoundError:
+                pass
+
+    st.markdown("---")
     st.markdown("### ℹ️ **System Status**")
     st.info("Engine: YOLOv8 + ByteTrack\n\nStatus: Live Tracking Active")
 
@@ -328,7 +374,7 @@ if input_mode == "📹 Aerial Stream Analysis":
         tfile.close()
         video_path = tfile.name
     else:
-        video_path = "input_video (1).mp4"
+        video_path = "palm tree.mp4"
 
 elif input_mode == "📸 Photo & Camera Tree Classifier":
     st.markdown("""
