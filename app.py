@@ -242,7 +242,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### ℹ️ **System Status**")
-    st.info("Engine: YOLOv8 + ByteTrack\n\nStatus: Live Tracking Active")
+    st.info("Engine: YOLOv11 + ByteTrack\n\nStatus: Live Tracking Active")
 
 # ---------------------------------------------------------
 # 3. Main Interface Header, User Guide & Team Profiles
@@ -270,11 +270,11 @@ with col_exp1:
     with st.expander("📖 **About This System & User Guide**", expanded=False):
         st.markdown("""
         ### **Welcome to Palm Tree Tracker**
-        This application is designed for real-time aerial and mobile object detection to track and analyze palm trees and related vegetation.
+        This application is designed for real-time aerial and mobile object detection to track and analyze palm trees.
         
         #### **Key Features:**
-        * **Automated Identification:** Leverages **YOLOv8** model weights.
-        * **Multi-Class Support:** Detects and distinguishes palm or coconut features depending on the trained model labels.
+        * **Automated Identification:** Leverages custom-trained **YOLOv11** model weights.
+        * **Palm Tree Counting:** Detects and counts palm trees accurately.
         * **Mobile Optimized:** High-FPS throughput and real-time analytics.
         """)
 
@@ -379,11 +379,11 @@ if input_mode == "📹 Aerial Stream Analysis":
 elif input_mode == "📸 Photo & Camera Tree Classifier":
     st.markdown("""
         <div class="camera-feature-card">
-            <h4 style="margin:0 0 8px 0; color:#81c784;">🔍 Palm & Coconut Tree Identification</h4>
+            <h4 style="margin:0 0 8px 0; color:#81c784;">🔍 Palm Tree Identification</h4>
             <p style="margin:0 0 10px 0; font-size:13px; color:#c8e6c9;">
-                Upload a photo or take a live camera shot to identify and classify trees:
+                Upload a photo or take a live camera shot to identify and count palm trees:
             </p>
-            <span class="badge-palm">🌴 Palm / Coconut Tracker</span>
+            <span class="badge-palm">🌴 Palm Tree Tracker</span>
         </div>
     """, unsafe_allow_html=True)
     
@@ -399,7 +399,7 @@ elif input_mode == "📸 Photo & Camera Tree Classifier":
         if uploaded_img is not None:
             image_bytes = uploaded_img.read()
     else:
-        camera_shot = st.camera_input("Take a photo to identify trees")
+        camera_shot = st.camera_input("Take a photo to identify palm trees")
         if camera_shot is not None:
             image_bytes = camera_shot.read()
 
@@ -444,7 +444,7 @@ if input_mode == "📸 Photo & Camera Tree Classifier" and image_bytes is not No
                 continue
                 
             tree_count += 1
-            class_name = model_names.get(int(cid), "Tree")
+            class_name = model_names.get(int(cid), "Palm Tree")
             labels.append(f"{class_name} ({conf:.2f})")
             filtered_classes.append(cid)
             filtered_boxes.append(box)
@@ -467,12 +467,12 @@ if input_mode == "📸 Photo & Camera Tree Classifier" and image_bytes is not No
         st.markdown(f"""
             <div class="metric-card">
                 <div class="metric-value">{tree_count}</div>
-                <div class="metric-label">🌴 Total Trees Detected</div>
+                <div class="metric-label">🌴 Total Palm Trees Detected</div>
             </div>
         """, unsafe_allow_html=True)
 
     if tree_count == 0:
-        st.warning("⚠️ No trees detected in this image. Try lowering the confidence threshold or uploading a clearer photo.")
+        st.warning("⚠️ No palm trees detected in this image. Try lowering the confidence threshold or uploading a clearer photo.")
 
     st.image(frame, channels="BGR", caption="Classification Result", use_container_width=True)
 
@@ -508,7 +508,7 @@ elif input_mode == "📷 Live Camera Streaming" and run_button:
             labels = []
             for tracker_id, cid in zip(detections.tracker_id, detections.class_id):
                 unique_tree_ids.add(int(tracker_id))
-                class_name = model_names.get(int(cid), "Tree")
+                class_name = model_names.get(int(cid), "Palm Tree")
                 labels.append(f"{class_name} #{tracker_id}")
                 
             frame = box_annotator.annotate(scene=frame, detections=detections)
@@ -521,7 +521,7 @@ elif input_mode == "📷 Live Camera Streaming" and run_button:
         metric_placeholder.markdown(f"""
             <div class="metric-card">
                 <div class="metric-value">{len(unique_tree_ids)}</div>
-                <div class="metric-label">🌴 Total Unique Trees Tracked (Live Camera)</div>
+                <div class="metric-label">🌴 Total Unique Palm Trees Tracked (Live Camera)</div>
             </div>
         """, unsafe_allow_html=True)
         
@@ -570,7 +570,7 @@ elif input_mode == "📹 Aerial Stream Analysis" and run_button:
             labels = []
             for tracker_id, cid in zip(detections.tracker_id, detections.class_id):
                 unique_tree_ids.add(int(tracker_id))
-                class_name = model_names.get(int(cid), "Tree")
+                class_name = model_names.get(int(cid), "Palm Tree")
                 labels.append(f"{class_name} #{tracker_id}")
 
             frame = box_annotator.annotate(scene=frame, detections=detections)
@@ -584,7 +584,7 @@ elif input_mode == "📹 Aerial Stream Analysis" and run_button:
         total_trees_metric.markdown(f"""
             <div class="metric-card">
                 <div class="metric-value">{len(unique_tree_ids)}</div>
-                <div class="metric-label">🌴 Total Trees Tracked</div>
+                <div class="metric-label">🌴 Total Palm Trees Tracked</div>
             </div>
         """, unsafe_allow_html=True)
         
