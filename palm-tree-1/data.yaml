@@ -1,0 +1,12 @@
+names:
+- palm tree
+nc: 1
+roboflow:
+  license: CC BY 4.0
+  project: palm-tree-jkpzn
+  url: https://universe.roboflow.com/capstone-p9zrm/palm-tree-jkpzn/dataset/1
+  version: 1
+  workspace: capstone-p9zrm
+test: ../test/images
+train: ../train/images
+val: ../valid/images
