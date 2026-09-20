@@ -6,6 +6,8 @@ import numpy as np
 import streamlit as st
 import supervision as sv
 from ultralytics import YOLO
+from streamlit_webrtc import webrtc_streamer, WebRtcMode
+import av
 
 # ---------------------------------------------------------
 # 1. Page Configuration & Custom UI Design
@@ -249,7 +251,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### ℹ️ **System Status**")
-    st.info("Engine: YOLOv11 + ByteTrack\n\nStatus: Live Tracking Active")
+    st.info("Engine: YOLOv11 + WebRTC\n\nStatus: Optimized for Cloud")
 
 # ---------------------------------------------------------
 # 3. Main Interface Header, User Guide & Team Profiles
@@ -363,7 +365,6 @@ if model is None:
     st.error("Error loading model: Please make sure 'yolov11n.pt' or 'best.pt' is available in your directory.")
     st.stop()
 
-# Extract class names dictionary if model has names
 model_names = model.names if hasattr(model, 'names') else {0: "Palm Tree"}
 
 # ---------------------------------------------------------
@@ -417,9 +418,9 @@ elif input_mode == "📸 Photo & Camera Tree Classifier":
 elif input_mode == "📷 Live Camera Streaming":
     st.markdown("""
         <div class="camera-feature-card">
-            <h4 style="margin:0 0 8px 0; color:#81c784;">📹 Real-Time Web Camera Feed</h4>
+            <h4 style="margin:0 0 8px 0; color:#81c784;">📹 Real-Time Web Camera Feed (WebRTC)</h4>
             <p style="margin:0 0 10px 0; font-size:13px; color:#c8e6c9;">
-                Use your device camera for real-time video detection and counting.
+                Smooth, non-blocking real-time browser video stream.
             </p>
         </div>
     """, unsafe_allow_html=True)
@@ -488,68 +489,56 @@ if input_mode == "📸 Photo & Camera Tree Classifier" and image_bytes is not No
     st.image(frame, channels="BGR", caption="Classification Result", use_container_width=True)
 
 elif input_mode == "📷 Live Camera Streaming" and run_button:
-    st.markdown("### 🔴 Live Web Camera Feed Running...")
-    cam_placeholder = st.empty()
-    metric_placeholder = st.empty()
+    st.markdown("### 🔴 Live WebRTC Stream Active")
     
-    cap = cv2.VideoCapture(0)
-    unique_tree_ids = set()
-    frame_count = 0
-    
-    while cap.isOpened():
-        ret, raw_frame = cap.read()
-        if not ret:
-            st.error("Failed to access web camera.")
-            break
+    class VideoProcessor:
+        def __init__(self):
+            self.frame_count = 0
+            self.last_annotated_frame = None
+
+        def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
+            img = frame.to_ndarray(format="bgr24")
+            self.frame_count += 1
+
+            if self.frame_count % frame_skip != 0 and self.last_annotated_frame is not None:
+                return av.VideoFrame.from_ndarray(self.last_annotated_frame, format="bgr24")
+
+            img_small = cv2.resize(img, (res_w, res_h))
+
+            results = model(img_small, conf=conf_threshold, verbose=False)[0]
+            detections = sv.Detections.from_ultralytics(results)
             
-        frame_count += 1
-        frame = cv2.resize(raw_frame, (res_w, res_h))
-        
-        results = model.track(
-            source=frame,
-            persist=True,
-            tracker="bytetrack.yaml",
-            conf=conf_threshold,
-            verbose=False
-        )[0]
-        
-        detections = sv.Detections.from_ultralytics(results)
-        
-        if detections.tracker_id is not None and detections.class_id is not None:
             labels = []
-            for tracker_id, cid in zip(detections.tracker_id, detections.class_id):
-                unique_tree_ids.add(int(tracker_id))
-                class_name = model_names.get(int(cid), "Palm Tree")
-                labels.append(f"{class_name} #{tracker_id}")
-                
-            frame = box_annotator.annotate(scene=frame, detections=detections)
-            frame = label_annotator.annotate(scene=frame, detections=detections, labels=labels)
+            if detections.class_id is not None:
+                for cid in detections.class_id:
+                    class_name = model_names.get(int(cid), "Palm Tree")
+                    labels.append(class_name)
+
+            annotated = box_annotator.annotate(scene=img_small, detections=detections)
+            annotated = label_annotator.annotate(scene=annotated, detections=detections, labels=labels)
             
-        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 30]
-        _, buffer = cv2.imencode('.jpg', frame, encode_param)
-        
-        cam_placeholder.image(buffer.tobytes(), use_container_width=True)
-        metric_placeholder.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-value">{len(unique_tree_ids)}</div>
-                <div class="metric-label">🌴 Total Unique Palm Trees Tracked (Live Camera)</div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-    cap.release()
+            annotated_resized = cv2.resize(annotated, (img.shape[1], img.shape[0]))
+            self.last_annotated_frame = annotated_resized
+            
+            return av.VideoFrame.from_ndarray(annotated_resized, format="bgr24")
+
+    webrtc_streamer(
+        key="palm-stream",
+        mode=WebRtcMode.SENDRECV,
+        video_processor_factory=VideoProcessor,
+        media_stream_constraints={"video": {"width": res_w, "height": res_h}, "audio": False},
+        async_processing=True
+    )
 
 elif input_mode == "📹 Aerial Stream Analysis" and run_button:
-    col_left, col_right = st.columns([1, 2])
+    st.markdown("### 📹 Processing Aerial Video Stream...")
     
-    with col_left:
-        st.markdown("### 📊 Live Analytics")
-        total_trees_metric = st.empty()
-        frame_placeholder = st.empty()
-        status_placeholder = st.empty()
-        
-    with col_right:
-        st.markdown("### 📹 Annotated Feed")
+    col_v1, col_v2 = st.columns([2, 1])
+    with col_v1:
         video_placeholder = st.empty()
+    with col_v2:
+        metric_placeholder = st.empty()
+        status_placeholder = st.empty()
 
     cap = cv2.VideoCapture(video_path)
     unique_tree_ids = set()
@@ -587,26 +576,18 @@ elif input_mode == "📹 Aerial Stream Analysis" and run_button:
             frame = box_annotator.annotate(scene=frame, detections=detections)
             frame = label_annotator.annotate(scene=frame, detections=detections, labels=labels)
 
-        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 30]
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 40]
         _, buffer = cv2.imencode('.jpg', frame, encode_param)
 
         video_placeholder.image(buffer.tobytes(), use_container_width=True)
         
-        total_trees_metric.markdown(f"""
+        metric_placeholder.markdown(f"""
             <div class="metric-card">
                 <div class="metric-value">{len(unique_tree_ids)}</div>
                 <div class="metric-label">🌴 Total Palm Trees Tracked</div>
+                <div style="font-size: 11px; color: #9e9e9e; margin-top: 5px;">Processed Frame: {frame_count}</div>
             </div>
         """, unsafe_allow_html=True)
-        
-        frame_placeholder.markdown(f"""
-            <div class="metric-card" style="border-color: #424242;">
-                <div class="metric-value" style="color: #9e9e9e;">{frame_count}</div>
-                <div class="metric-label">Processed Frames</div>
-            </div>
-        """, unsafe_allow_html=True)
-
-        status_placeholder.caption("🟢 **Status:** Processing Live Stream with YOLOv11...")
 
     cap.release()
     status_placeholder.success("✅ **Status:** Stream Completed Successfully!")
