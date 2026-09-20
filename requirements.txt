@@ -5,3 +5,5 @@ opencv-python-headless
 supervision
 lapx
 scipy
+streamlit-webrtc
+av
