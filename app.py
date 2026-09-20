@@ -181,6 +181,13 @@ with st.sidebar:
     st.caption("AI-Powered Tree Analytics System")
     st.markdown("---")
 
+    st.markdown("### 🤖 **Model Version**")
+    model_choice = st.selectbox(
+        "Select Model Weights",
+        ["yolov11n.pt (YOLOv11 - Fast & Accurate)", "best.pt / best.onnx (Custom Trained)"]
+    )
+    selected_model_file = "yolov11n.pt" if "yolov11n" in model_choice else "best.onnx"
+
     st.markdown("### ⚙️ **Detection Settings**")
     conf_threshold = st.slider("Confidence Threshold", 0.05, 1.0, 0.40, 0.05)
     
@@ -273,7 +280,7 @@ with col_exp1:
         This application is designed for real-time aerial and mobile object detection to track and analyze palm trees.
         
         #### **Key Features:**
-        * **Automated Identification:** Leverages custom-trained **YOLOv11** model weights.
+        * **Automated Identification:** Leverages state-of-the-art **YOLOv11** model weights.
         * **Palm Tree Counting:** Detects and counts palm trees accurately.
         * **Mobile Optimized:** High-FPS throughput and real-time analytics.
         """)
@@ -337,19 +344,25 @@ label_annotator = sv.LabelAnnotator(
     text_color=sv.Color(r=0, g=0, b=0)
 )
 
-# Model Loader
+# Model Loader supporting YOLOv11 and custom models
 @st.cache_resource
-def load_yolo_model():
-    for path in ["best.onnx", "best.pt"]:
-        try:
-            return YOLO(path)
-        except Exception:
-            continue
-    return None
+def load_yolo_model(model_filename):
+    for path in [model_filename, "yolov11n.pt", "best.onnx", "best.pt", "yolov8n.pt"]:
+        if os.path.exists(path):
+            try:
+                return YOLO(path)
+            except Exception:
+                continue
+    # Fallback to downloading/loading yolov11n directly
+    try:
+        return YOLO("yolov11n.pt")
+    except Exception:
+        return None
 
-model = load_yolo_model()
+import os
+model = load_yolo_model(selected_model_file)
 if model is None:
-    st.error("Error loading model: Neither 'best.onnx' nor 'best.pt' could be loaded.")
+    st.error("Error loading model: Please make sure 'yolov11n.pt' or 'best.pt' is available in your directory.")
     st.stop()
 
 # Extract class names dictionary if model has names
@@ -595,7 +608,7 @@ elif input_mode == "📹 Aerial Stream Analysis" and run_button:
             </div>
         """, unsafe_allow_html=True)
 
-        status_placeholder.caption("🟢 **Status:** Processing Live Stream...")
+        status_placeholder.caption("🟢 **Status:** Processing Live Stream with YOLOv11...")
 
     cap.release()
     status_placeholder.success("✅ **Status:** Stream Completed Successfully!")
