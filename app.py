@@ -337,10 +337,10 @@ label_annotator = sv.LabelAnnotator(
     text_color=sv.Color(r=0, g=0, b=0)
 )
 
-# Model Loader (Prioritizing yolo11n.pt)
+# Model Loader
 @st.cache_resource
 def load_yolo_model():
-    for path in ["yolo11n.pt", "best.onnx", "best.pt"]:
+    for path in ["best.onnx", "best.pt"]:
         try:
             return YOLO(path)
         except Exception:
@@ -349,7 +349,7 @@ def load_yolo_model():
 
 model = load_yolo_model()
 if model is None:
-    st.error("Error loading model: Could not load 'yolo11n.pt', 'best.onnx', or 'best.pt'.")
+    st.error("Error loading model: Neither 'best.onnx' nor 'best.pt' could be loaded.")
     st.stop()
 
 # Extract class names dictionary if model has names
@@ -483,6 +483,7 @@ elif input_mode == "📷 Live Camera Streaming" and run_button:
     
     cap = cv2.VideoCapture(0)
     unique_tree_ids = set()
+    frame_count = 0
     
     while cap.isOpened():
         ret, raw_frame = cap.read()
@@ -490,6 +491,7 @@ elif input_mode == "📷 Live Camera Streaming" and run_button:
             st.error("Failed to access web camera.")
             break
             
+        frame_count += 1
         frame = cv2.resize(raw_frame, (res_w, res_h))
         
         results = model.track(
