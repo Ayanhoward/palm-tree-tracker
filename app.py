@@ -1,6 +1,6 @@
 import base64
 import tempfile
-import time
+import os
 import cv2
 import numpy as np
 import streamlit as st
@@ -353,13 +353,11 @@ def load_yolo_model(model_filename):
                 return YOLO(path)
             except Exception:
                 continue
-    # Fallback to downloading/loading yolov11n directly
     try:
         return YOLO("yolov11n.pt")
     except Exception:
         return None
 
-import os
 model = load_yolo_model(selected_model_file)
 if model is None:
     st.error("Error loading model: Please make sure 'yolov11n.pt' or 'best.pt' is available in your directory.")
