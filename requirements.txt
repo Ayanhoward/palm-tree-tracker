@@ -1,9 +1,11 @@
 streamlit
 ultralytics
-onnxruntime
 opencv-python-headless
+numpy
+pandas
 supervision
-lapx
-scipy
 streamlit-webrtc
 av
+folium
+streamlit-folium
+plotly
